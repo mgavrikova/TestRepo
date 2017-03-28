@@ -21,7 +21,7 @@ namespace IntoBuild
 		private const string VersionGroup = "version";
 		private const string EndGroup = "end";
 		private Regex _regex =
-			new Regex(@"(?<attribute>Assembly(File){0,1}Version\(\x22)(?<version>\d.\d.\d(.\d){0,1})(?<end>\x22\))", RegexOptions.Compiled);
+			new Regex(@"(?<attribute>Assembly(File){0,1}Version\(\x22)(?<version>([\d]{1,3}.){4})(?<end>\x22\))", RegexOptions.Compiled);
 
 		public Task Execute(BuildContext context)
 		{
@@ -60,10 +60,10 @@ namespace IntoBuild
 
 		private string OnProcessVersionMatch(Match match)
 		{
-			var versionString = match.Groups["version"].Value;
+			var versionString = match.Groups[VersionGroup].Value;
 			Version version = Version.Parse(versionString);
 			Version newVersion = new Version(version.Major, version.Minor, version.Build, version.Revision + 1);
-			var result = match.Groups["attribute"].Value + newVersion + match.Groups["end"];
+			var result = match.Groups[AttributeGroup].Value + newVersion + match.Groups[EndGroup];
 			return result;
 		}
 	}
