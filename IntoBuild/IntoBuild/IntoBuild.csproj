@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GitCommitTaskElement.cs" />
+    <Compile Include="GitPushTaskElement.cs" />
     <Compile Include="IncreaseVersionTaskElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

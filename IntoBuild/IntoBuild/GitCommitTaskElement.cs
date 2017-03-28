@@ -29,24 +29,27 @@ namespace IntoBuild
 
 			try
 			{
-				using (var repository = new Repository(solutionFolder))
+				var modifiedFiles = (List<string>)context["ModifiedFiles"];
+				if (modifiedFiles == null || !modifiedFiles.Any())
 				{
-					var modifiedFiles = (List<string>)context["ModifiedFiles"];
-					if (!modifiedFiles.Any())
+					taskCompletionSource.TrySetException(new BuildException(BuildResult.TaskElementError));
+				}
+				else
+				{
+					using (var repository = new Repository(solutionFolder))
 					{
-						taskCompletionSource.TrySetException(new BuildException(BuildResult.TaskElementError));
+						foreach (var file in modifiedFiles)
+						{
+							repository.Index.Add(file);
+						}
+						var commit = repository.Commit(CommitMessage);
+						if (!commit.IsValid)
+						{
+							taskCompletionSource.TrySetException(new BuildException(BuildResult.TaskElementError));
+						}
+						context[$"Commit{_taskId}"] = commit;
+						taskCompletionSource.TrySetResult(0);
 					}
-					foreach (var file in modifiedFiles)
-					{
-						repository.Index.Add(file);
-					}
-					var commit = repository.Commit(CommitMessage);
-					if (!commit.IsValid)
-					{
-						taskCompletionSource.TrySetException(new BuildException(BuildResult.TaskElementError));
-					}
-					context[$"Commit{_taskId}"] = commit;
-					taskCompletionSource.TrySetResult(0);
 				}
 			}
 			catch (Exception ex)

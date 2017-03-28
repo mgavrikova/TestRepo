@@ -32,9 +32,11 @@ namespace IntoBuild
 				{
 					PushCommand pushCommand = new PushCommand
 					{
-						
-						Repository = repository
+						Force = true,
+						Repository = repository,
+						RefSpecs = new List<RefSpec>()
 					};
+					pushCommand.AddAll();
 					pushCommand.Execute();
 					taskCompletionSource.TrySetResult(0);
 				}
